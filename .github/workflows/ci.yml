@@ -1,0 +1,40 @@
+name: CI/CD Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    if: github.event_name == 'pull_request'
+    uses: ahincho/nova-devops/.github/workflows/reusable-build-maven.yml@main
+    secrets: inherit
+
+  matrix:
+    if: github.event_name == 'pull_request'
+    uses: ahincho/nova-devops/.github/workflows/reusable-build-matrix.yml@main
+    with:
+      build-tool: maven
+    secrets: inherit
+
+  owasp:
+    if: github.event_name == 'pull_request'
+    uses: ahincho/nova-devops/.github/workflows/reusable-owasp-check.yml@main
+    with:
+      build-tool: maven
+    secrets: inherit
+
+  sbom:
+    if: github.event_name == 'pull_request'
+    uses: ahincho/nova-devops/.github/workflows/reusable-sbom.yml@main
+    with:
+      build-tool: maven
+    secrets: inherit
